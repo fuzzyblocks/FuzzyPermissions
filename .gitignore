@@ -1,0 +1,21 @@
+/target/
+/.idea/
+*.iml
+
+# Gradle build outputs and caches
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+.gradletasknamecache
+*.class
+*.log
+.vscode/
+
+# Ignore Gradle project-specific cache directory
+.gradle
+
+# Ignore Gradle build output directory
+build
+
+# Ignore Kotlin plugin data
+.kotlin

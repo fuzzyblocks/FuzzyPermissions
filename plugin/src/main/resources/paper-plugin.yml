@@ -1,0 +1,11 @@
+name: FuzzyPermissions
+version: "1.0.0-SNAPSHOT"
+description: Role-based permissions plugin for Paper
+api-version: "1.21"
+authors: [ "Chris Darnell" ]
+
+# The main plugin class
+main: net.fuzzyblocks.fuzzypermissions.plugin.FuzzyPermissionsPlugin
+
+# The bootstrapper, run before the server even loads worlds
+bootstrapper: net.fuzzyblocks.fuzzypermissions.plugin.FuzzyPermissionsBootstrapper

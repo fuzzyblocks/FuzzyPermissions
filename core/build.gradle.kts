@@ -1,5 +1,6 @@
 plugins {
     kotlin("jvm")
+    `java-library`
 }
 
 java {
@@ -7,7 +8,7 @@ java {
 }
 
 dependencies {
-    implementation(project(":api"))
+    api(project(":api"))
 
     // Concurrency
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")

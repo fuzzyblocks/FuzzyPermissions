@@ -13,7 +13,9 @@ import net.fuzzyblocks.fuzzypermissions.core.database.repository.PermissionRepos
 import net.fuzzyblocks.fuzzypermissions.core.permission.PermissionCache
 import net.fuzzyblocks.fuzzypermissions.core.permission.PlayerPermissionService
 import net.fuzzyblocks.fuzzypermissions.core.permission.SnapshotEngine
+import net.fuzzyblocks.fuzzypermissions.plugin.listener.PermissibleInjectionListener
 import net.fuzzyblocks.fuzzypermissions.plugin.listener.PlayerConnectionListener
+import net.fuzzyblocks.fuzzypermissions.plugin.permissible.PermissibleInjector
 import org.bukkit.plugin.java.JavaPlugin
 import java.util.logging.Level
 
@@ -36,8 +38,20 @@ class FuzzyPermissionsPlugin : JavaPlugin() {
     var permissionService: PlayerPermissionService? = null
         private set
 
+    private lateinit var injector: PermissibleInjector
+
     override fun onEnable() {
         saveDefaultConfig()
+
+        injector = try {
+            PermissibleInjector.create(cache)
+        } catch (e: IllegalStateException) {
+            logger.log(Level.SEVERE, "Permissible injection is not supported on this server build.", e)
+            server.pluginManager.disablePlugin(this)
+            return
+        }
+        server.pluginManager.registerEvents(PermissibleInjectionListener(injector), this)
+        server.onlinePlayers.forEach(injector::inject)
 
         val credentials = DatabaseCredentials(
             type = config.getString("database.type", "sqlite")!!,
@@ -79,6 +93,7 @@ class FuzzyPermissionsPlugin : JavaPlugin() {
     }
 
     override fun onDisable() {
+        if (::injector.isInitialized) server.onlinePlayers.forEach(injector::uninject)
         scope.cancel()
         if (::database.isInitialized) database.close()
         DatabaseDispatcher.close()

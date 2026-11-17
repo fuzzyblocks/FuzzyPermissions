@@ -4,6 +4,7 @@ import net.fuzzyblocks.fuzzypermissions.api.model.PlayerPermissionSnapshot
 import net.fuzzyblocks.fuzzypermissions.api.model.RoleSnapshot
 import net.fuzzyblocks.fuzzypermissions.core.database.repository.PermissionRepository
 import net.fuzzyblocks.fuzzypermissions.core.database.repository.PlayerRoleAssignment
+import java.util.Locale
 import java.util.UUID
 
 class SnapshotEngine(
@@ -19,7 +20,9 @@ class SnapshotEngine(
      */
     suspend fun reloadGlobalDefinitions() {
         // Build the new map, then swap the reference atomically
-        cachedRoles = repository.loadRoles().associateBy { it.id }
+        cachedRoles = repository.loadRoles()
+            .map { role -> role.copy(permissions = role.permissions.mapTo(HashSet()) { it.lowercase(Locale.ROOT)}) }
+            .associateBy { it.id }
     }
 
     fun getRoleByName(name: String): RoleSnapshot? =
